@@ -6,13 +6,13 @@ import rospy
 import math
 from geometry_msgs.msg import PoseStamped
 from mavros_msgs.msg import Altitude, ExtendedState, HomePosition, ParamValue, State, \
-                            WaypointList
+                            WaypointList, AttitudeTarget
 from mavros_msgs.srv import CommandBool, ParamGet, ParamSet, SetMode, SetModeRequest, WaypointClear, \
                             WaypointPush
 from pymavlink import mavutil
 from sensor_msgs.msg import NavSatFix, Imu
 from six.moves import xrange
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Float32
 
 
 class MavrosTestCommon(unittest.TestCase):
@@ -30,6 +30,7 @@ class MavrosTestCommon(unittest.TestCase):
         self.state = State()
         self.mav_type = None
         self.mission_done = Bool(False)
+        self.desired_position = PoseStamped()
 
         self.sub_topics_ready = {
             key: False
@@ -84,7 +85,13 @@ class MavrosTestCommon(unittest.TestCase):
             'mavros/mission/waypoints', WaypointList, self.mission_wp_callback)
         self.state_sub = rospy.Subscriber('mavros/state', State,
                                           self.state_callback)
-        self.mission_status_sub = rospy.Subscriber('mission_status', Bool, self.mission_status_cb)
+        self.mission_status_sub = rospy.Subscriber('mission_status', Bool,
+                                                  self.mission_status_cb)
+        self.desired_pos_sub = rospy.Subscriber('desired_pos', PoseStamped,
+                                                self.desired_position_callback)
+
+        self.desired_atti_sub = rospy.Subscriber('desired_atti', AttitudeTarget,
+                                                self.desired_atti_callback)
 
     def tearDown(self):
         self.log_topic_vars()
@@ -178,6 +185,12 @@ class MavrosTestCommon(unittest.TestCase):
 
     def mission_status_cb(self, data):
         self.mission_done = data
+
+    def desired_position_callback(self, data):
+        self.desired_position = data
+
+    def desired_atti_callback(self, data):
+        self.desired_atti = data
 
     #
     # Helper methods
