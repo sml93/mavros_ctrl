@@ -57,10 +57,13 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
         self.att.body_rate = Vector3()
         self.att.header = Header()
         self.att.header.frame_id = "base_footprint"
-        self.att.orientation = Quaternion(*quaternion_from_euler(-0.25, 0.15,
-                                                                 0))
-        self.att.thrust = 0.7
-        self.att.type_mask = 7  # ignore body rate
+        self.att.type_mask = 128  # ignore orientation
+        # self.att.orientation = Quaternion(*quaternion_from_euler(-0.25, 0.15, 0))
+        self.att.body_rate.x = 0.0      # roll
+        self.att.body_rate.y = 0.1      # pitch 
+        self.att.body_rate.z = 0.0      # yaw
+        self.att.thrust = 0.75
+        
 
         while not rospy.is_shutdown():
             self.att.header.stamp = rospy.Time.now()
@@ -101,12 +104,12 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
         for i in xrange(timeout * loop_freq):
             if (self.local_position.pose.position.x > boundary_x and
                     self.local_position.pose.position.y > boundary_y and
-                    self.local_position.pose.position.z > boundary_z) or not self.mission_done.data:
+                    self.local_position.pose.position.z > boundary_z):
                 rospy.loginfo("boundary crossed | seconds: {0} of {1}".format(
                     i / loop_freq, timeout))
                 crossed = True
                 break
-        
+    
             try:
                 rate.sleep()
             except rospy.ROSException as e:
@@ -116,7 +119,9 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
             "took too long to cross boundaries | current position x: {0:.2f}, y: {1:.2f}, z: {2:.2f} | timeout(seconds): {3}".
             format(self.local_position.pose.position.x,
                 self.local_position.pose.position.y,
-                self.local_position.pose.position.z, timeout)))      
+                self.local_position.pose.position.z, timeout)))    
+
+        self.send_att(0.0, -0.1, 0.0) 
         
         self.set_mode("AUTO.LOITER", 5)
         t = 3
