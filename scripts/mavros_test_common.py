@@ -12,7 +12,7 @@ from mavros_msgs.srv import CommandBool, ParamGet, ParamSet, SetMode, SetModeReq
 from pymavlink import mavutil
 from sensor_msgs.msg import NavSatFix, Imu
 from six.moves import xrange
-from std_msgs.msg import Bool, Float32
+from std_msgs.msg import Bool, Float64
 
 
 class MavrosTestCommon(unittest.TestCase):
@@ -31,6 +31,8 @@ class MavrosTestCommon(unittest.TestCase):
         self.mav_type = None
         self.mission_done = Bool(False)
         self.desired_position = PoseStamped()
+        self.desired_atti = AttitudeTarget()
+        self.desired_atti_y = Float64()
 
         self.sub_topics_ready = {
             key: False
@@ -92,6 +94,9 @@ class MavrosTestCommon(unittest.TestCase):
 
         self.desired_atti_sub = rospy.Subscriber('desired_atti', AttitudeTarget,
                                                 self.desired_atti_callback)
+
+        self.desired_atti_y_sub = rospy.Subscriber('desired_atti_y', Float64,
+                                                self.desired_atti_y_callback)
 
     def tearDown(self):
         self.log_topic_vars()
@@ -191,6 +196,10 @@ class MavrosTestCommon(unittest.TestCase):
 
     def desired_atti_callback(self, data):
         self.desired_atti = data
+
+    def desired_atti_y_callback(self, data):
+        self.desired_atti_y = data
+
 
     #
     # Helper methods
