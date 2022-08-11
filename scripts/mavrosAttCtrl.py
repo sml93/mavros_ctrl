@@ -22,9 +22,13 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 	def setUp(self):
 		super(MavrosOffboardAttctlTest, self).setUp()
 		self.x = 0.0
-		self.y = 0.05
+		self.y = 0.0
 		self.z = 0.0
+		self.thrust = 0.7
+		self.desired_atti.orientation.x = self.x
 		self.desired_atti.orientation.y = self.y
+		self.desired_atti.orientation.z = self.z
+		self.desired_atti.thrust = self.thrust
 
 		self.att = AttitudeTarget()
 		
@@ -43,8 +47,8 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 		self.att.body_rate = Vector3()
 		self.att.header = Header()
 		self.att.header.frame_id = "base_footprint"
-		self.att.orientation = Quaternion(*quaternion_from_euler(self.x, self.desired_atti.orientation.y, self.z))
-		self.att.thrust = 0.71
+		self.att.orientation = Quaternion(*quaternion_from_euler(self.desired_atti.orientation.x, self.desired_atti.orientation.y, self.desired_atti.orientation.z))
+		self.att.thrust = self.desired_atti.thrust
 		self.att.type_mask = 7		# ignoring body rates
 
 		while not rospy.is_shutdown():
@@ -56,10 +60,14 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 				pass
 
 	def resend_att(self):
+		x = float(self.desired_atti.orientation.x)
 		y = float(self.desired_atti.orientation.y)
-		self.att.orientation = Quaternion(*quaternion_from_euler(self.x, y, self.z))
-		rospy.loginfo("sending new orientation | x: {0}, y: {1}, z:{2}".
-									format(self.att.orientation.x, self.att.orientation.y, self.att.orientation.z))
+		z = float(self.desired_atti.orientation.z)
+		thrust = float(self.desired_atti.thrust)
+		self.att.orientation = Quaternion(*quaternion_from_euler(x, y, z))
+		self.att.thrust = thrust
+		rospy.loginfo("sending new orientation | x: {0}, y: {1}, z:{2}, thrust:{3}".
+									format(self.att.orientation.x, self.att.orientation.y, self.att.orientation.z, self.att.thrust))
 
 	def test_attctrl(self):
 		# boundary_x = 20
