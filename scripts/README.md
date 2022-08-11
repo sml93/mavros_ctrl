@@ -16,7 +16,7 @@ This repo is for sending position or attitude setpoints through mavros offboard 
 
 /mission_status will act as an emergency feature, once activated, will send the UAV to LOITER then LAND after 3 secs. Safety feature for simulation and real-life experiments.  
 
-TO USE:
+TO USE:  
 terminal 1: $**roslaunch px4 posix_sitl.launch or px4_sitl.launch**  
 terminal 2: $**roslaunch mavros px4.launch fcu_url:="udp://:14540@127.0.0.1:14557"** (for gazebo simulation)  
 terminal 3: (Optional) ./QGroundControl.AppImage (if you need to rtl or change settings)  
@@ -41,7 +41,8 @@ pose:
   
 or  
   
-$**rostopic pub /desired_atti mros_msgs/AttitudeTarget** "header:  
+$**rostopic pub /desired_atti mavros_msgs/AttitudeTarget**  
+"header:  
   seq: 0  
   stamp: {secs: 0, nsecs: 0}  
   frame_id: ''  
