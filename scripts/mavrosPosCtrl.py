@@ -39,6 +39,8 @@ class MavrosOffboardPosCtlTest(MavrosTestCommon):
         self.x = 0.0
         self.y = 0.0
         self.z = 1.0
+        self.desired_position.pose.position.x = self.x
+        self.desired_position.pose.position.y = self.y
         self.desired_position.pose.position.z = self.z
 
         self.pos_setpoint_pub = rospy.Publisher(
@@ -79,7 +81,6 @@ class MavrosOffboardPosCtlTest(MavrosTestCommon):
             yaw = np.deg2rad(yaw_degrees)
             quaternion = quaternion_from_euler(0, 0, yaw)
             self.pos.pose.orientation = Quaternion(*quaternion)
-            
             self.pos.header.stamp = rospy.Time.now()
             self.pos_setpoint_pub.publish(self.pos)
             self.attRunning_pub.publish(self.Bool)
@@ -106,12 +107,13 @@ class MavrosOffboardPosCtlTest(MavrosTestCommon):
     def reach_position(self, x, y, timeout):
         """timeout(int): seconds"""
         # set a position setpoint
-        self.pos.pose.position.x = x
-        self.pos.pose.position.y = y
+        self.pos.pose.position.x = self.desired_position.pose.position.x
+        self.pos.pose.position.y = self.desired_position.pose.position.y
         self.pos.pose.position.z = self.desired_position.pose.position.z
         rospy.loginfo(
             "attempting to reach position | x: {0}, y: {1}, z: {2} | current position x: {3:.2f}, y: {4:.2f}, z: {5:.2f}".
-            format(x, y, self.desired_position.pose.position.z, self.local_position.pose.position.x,
+            format(self.desired_position.pose.position.x, self.desired_position.pose.position.y, 
+                   self.desired_position.pose.position.z, self.local_position.pose.position.x,
                    self.local_position.pose.position.y,
                    self.local_position.pose.position.z))
 
