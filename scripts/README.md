@@ -14,7 +14,7 @@ This repo is for sending position or attitude setpoints through mavros offboard 
 
 /desired_att will allow for varying 3D attitude and thrust.  
 
-/mission_status will act as an emergency feature, once activated, will send the UAV to LOITER then LAND after 3 secs. Safety feature for simulation and real-life experiments.  
+/mission_status will act as an emergency feature, once activated, will send the UAV to LOITER then RTL/LAND after 3 secs. Safety feature for simulation and real-life experiments.  
 
 TO USE:  
 terminal 1: $**roslaunch px4 posix_sitl.launch or px4_sitl.launch**  
@@ -48,7 +48,7 @@ $**rostopic pub /desired_atti mavros_msgs/AttitudeTarget**
 type_mask: 0  
 orientation: {x: 0.0, y: **-/+x.xx**, z: 0.0, w: 0.0}  
 body_rate: {x: 0.0, y: 0.0, z: 0.0}  
-thrust: 0.7"   
+thrust: **x.x**"   
 
 terminal 6: $**rostopic pub /mission_status std_msgs/Bool True**  
 

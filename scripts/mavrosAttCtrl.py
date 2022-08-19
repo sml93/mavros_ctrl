@@ -41,7 +41,6 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 	def tearDown(self):
 		super(MavrosOffboardAttctlTest, self).tearDown()
 
-	
 	def send_att(self):
 		rate = rospy.Rate(10)
 		self.att.body_rate = Vector3()
@@ -117,7 +116,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 			time.sleep(1)
 			t -= 1
 
-		self.set_mode("AUTO.LAND", 5)
+		self.set_mode("AUTO.RTL", 5)
 		self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND, 90, 0)
 		self.set_arm(False, 5)
 
