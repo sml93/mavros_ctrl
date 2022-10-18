@@ -12,7 +12,7 @@ from six.moves import xrange
 from threading import Thread
 from pymavlink import mavutil
 from std_msgs.msg import Header
-from mavros_msgs.msg import AttitudeTarget
+from mavros_msgs.msg import ParamValue, AttitudeTarget
 from mavros_test_common import MavrosTestCommon
 from geometry_msgs.msg import Quaternion, Vector3
 from tf.transformations import quaternion_from_euler
@@ -24,7 +24,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 		self.x = 0.0
 		self.y = 0.0
 		self.z = 0.0
-		self.thrust = 0.7
+		self.thrust = 0.72
 		self.desired_atti.orientation.x = self.x
 		self.desired_atti.orientation.y = self.y
 		self.desired_atti.orientation.z = self.z
@@ -32,7 +32,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 
 		self.att = AttitudeTarget()
 		
-		self.att_setpoint_pub = rospy.Publisher('mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=1)
+		self.att_setpoint_pub = rospy.Publisher('mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=10)
 
 		self.att_thread = Thread(target=self.send_att, args=())
 		self.att_thread.daemon = True
@@ -77,6 +77,8 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 		self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND, 10, -1)
 
 		self.log_topic_vars()
+		rcl_except = ParamValue(1<<2, 0.0)
+		self.set_param("COM_RCL_EXCEPT", rcl_except, 5)
 		self.set_mode("OFFBOARD", 5)
 		self.set_arm(True, 5)
 
@@ -116,7 +118,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 			time.sleep(1)
 			t -= 1
 
-		self.set_mode("AUTO.RTL", 5)
+		self.set_mode("AUTO.LAND", 5)
 		self.wait_for_landed_state(mavutil.mavlink.MAV_LANDED_STATE_ON_GROUND, 90, 0)
 		self.set_arm(False, 5)
 
