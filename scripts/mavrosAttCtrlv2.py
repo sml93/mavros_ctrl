@@ -27,6 +27,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 		self.y = 0.0
 		self.z = 0.0
 		self.thrust = 0.72
+		# self.thrust = 0.6
 		self.desired_atti.orientation.x = self.x
 		self.desired_atti.orientation.y = self.y
 		self.desired_atti.orientation.z = self.z
@@ -34,7 +35,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 
 		self.att = AttitudeTarget()
 		
-		self.att_setpoint_pub = rospy.Publisher('mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=10)
+		self.att_setpoint_pub = rospy.Publisher('mavros/setpoint_raw/attitude', AttitudeTarget, queue_size=100)
 
 		self.att_thread = Thread(target=self.send_att, args=())
 		self.att_thread.daemon = True
@@ -44,7 +45,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 		super(MavrosOffboardAttctlTest, self).tearDown()
 
 	def send_att(self):
-		rate = rospy.Rate(10)
+		rate = rospy.Rate(100)
 		self.att.body_rate = Vector3()
 		self.att.header = Header()
 		self.att.header.frame_id = "base_footprint"
@@ -67,6 +68,7 @@ class MavrosOffboardAttctlTest(MavrosTestCommon):
 	def resend_att(self):
 		self.att.header = Header()
 		self.att.header.frame_id = "base_footprint"
+		self.att.type_mask = 7		# ignoring body rates
 		self.att.orientation.w = self.desired_atti.orientation.w
 		self.att.orientation.x = self.desired_atti.orientation.x
 		self.att.orientation.y = self.desired_atti.orientation.y
